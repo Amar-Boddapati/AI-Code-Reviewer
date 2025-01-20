@@ -1,4 +1,6 @@
 # GenAI-Code-Reviewer
+## objective:-
+The objective of this project was to develop a Python application that allows users to submit their Python code for review and receive feedback on potential bugs along with suggestions for fixes. The application is built to be user-friendly, efficient, and provide accurate bug reports and fixed code snippets.
 ## Overview
 This is a simple GenAI application where it can input a Python script and look for potential bugs and give feedback and suggestions for fixes with accurate bug reports and code snippets.
 The interface is built using streamlit for now, for ease of implementation and immediate updation of code in the repo. Soon I will be doing the same in Flask too, so stay tuned :)
@@ -25,6 +27,6 @@ The interface is built using streamlit for now, for ease of implementation and i
 10)Once created copy the API key and save it somewhere safe and secure
 
 11)You can use this key to build your GenAI applications
-## Code files info
-app.py contains the code to a Chatbot-themed application, similar to that of ChatGPT. It can store the history and can be used to bring back the previous if asked
-app_review.py contains an updated code with much better interface and the with separate input and output tabs, anc the input can be written seamlessly too, yet the history won't be saved in this
+
+
+
