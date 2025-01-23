@@ -1,34 +1,131 @@
 import streamlit as st
 import google.generativeai as genai
 
-#setting up the API key
-genai.configure(api_key =r"Your API Key")
+genai.configure(api_key = r"API_KEY")
 
-#setting up the headers
-st.title("👨‍💻:violet[PYRE AI Python Code Reviewer..!!]😍")
-st.subheader(':green[***Issues with your python code? Review your codebase now!***]🧐')
+st.markdown("""
+    <style>
+        .stApp {
+            background: linear-gradient(to right, #1E3A8A, #3B82F6);
+            animation: gradientAnimation 5s ease infinite;
+        }
 
-#taking user input
-user_prompt = st.text_area("Enter your Python code here...!",placeholder="Paste your code here.....",height=200)
+        @keyframes gradientAnimation {
+            0% {background: linear-gradient(to right, #1E3A8A, #3B82F6);}
+            50% {background: linear-gradient(to right, #2563EB, #4F46E5);}
+            100% {background: linear-gradient(to right, #1E3A8A, #3B82F6);}
+        }
 
-#prompt is provided
-sys_prompt=("""You are a friendly AI assistant.
-                                                    Given a python code to review, analyze the submitted code and identify bugs, errors or areas of improvement.
-                                                    Provide the fixed code snippets.
-                                                    Explain the reasoning behind code corrections or suggestions. 
-                                                    If the code is not in python politely 
-                                                    remind the user that you are a python code review assistant.
-                                                   """)
+        .stButton>button {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 12px;
+            padding: 10px 24px;
+            box-shadow: 0 9px #999;
+        }
 
-model = genai.GenerativeModel(model_name="models/gemini-1.5-flash",system_instruction=sys_prompt)
+        .stButton>button:hover {
+            background-color: #45a049;
+            box-shadow: 0 12px #999;
+            transform: translateY(-4px);
+        }
 
-#if the button is clicked, generate responses
-button = st.button(":red[Generate Review]")
-if button:
-    response = model.generate_content([user_prompt,sys_prompt])
-    st.title(":red[Corrected Bug...🔎]")
+        .stTextArea textarea {
+            background-color: #F3F4F6;
+            color: #333;
+            border-radius: 8px;
+            padding: 15px;
+        }
 
+        .success-message {
+            background-color: #FFD700;
+            color: black;
+            padding: 20px;
+            font-size: 18px;
+            border-radius: 10px;
+        }
 
- #printing the response on the webpage
-    st.write(response.text)
-    
+        .history-message {
+            background-color: #98C9E1;
+            color: black;
+            padding: 20px;
+            font-size: 18px;
+            border-radius: 10px;
+        }
+
+        .animated-effect {
+            font-size: 22px;
+            color: #FF6347;
+            animation: pulseEffect 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseEffect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.title("✨ Amar's AI Code Reviewer and Generater🤖")
+
+llm = genai.GenerativeModel("models/gemini-1.5-flash")
+chatbot = llm.start_chat(history=[])
+
+if "chat_history" not in st.session_state:
+    st.session_state["chat_history"] = []
+
+def update_chat(role, message):
+    st.session_state["chat_history"].append({"role": role, "content": message})
+
+st.markdown("""
+    <h3 style="color: #FF6347;">Welcome to the AI Code Reviewer App! 🎉</h3>
+    <p style="font-size: 18px; color: #fff; background-color: #4CAF50; padding: 10px; border-radius: 10px;">
+    Let the AI Review or Generate it for you!
+    </p>
+    """, unsafe_allow_html=True)
+
+input_code = st.text_area("**Enter your Python code here or  Which code you want:**", height=200)
+
+if st.button("Result:"):
+    st.markdown("""
+        <div class="animated-effect">
+            🚀 Please Wait ...  as your Result is Generating!
+        </div>
+    """, unsafe_allow_html=True)
+
+    if input_code.strip():
+        update_chat("human", input_code)
+        review_prompt = f"Review the following Python code to identify any critical issues, focusing on potential bugs, inefficiencies, or areas for improvement. Then, provide concise suggestions for enhancing the code's functionality, performance, or readability:\n{input_code}"
+        response = chatbot.send_message(review_prompt)
+
+        update_chat("ai", response.text)
+        st.success("Successfully Excuted! See suggestions below.")
+        st.subheader("AI Suggestions Results:")
+        st.write(response.text)
+
+        st.markdown("""
+            <div class="animated-effect">
+                🎉 Review complete! Check Suggestion above.
+            </div>
+        """, unsafe_allow_html=True)
+
+    else:
+        st.warning("Please Enter python code to review.")
+
+if st.button("Show Previous History"):
+    st.markdown("""
+        <div class="history-message">
+            Here's the past Search history.
+        </div>
+    """, unsafe_allow_html=True)
+
+    if st.session_state["chat_history"]:
+        st.subheader("Past Review History")
+        for entry in st.session_state["chat_history"]:
+            role = "User" if entry["role"] == "human" else "AI"
+            st.markdown(f"*{role}:* {entry['content']}")
+    else:
+        st.info("No history available yet.")
